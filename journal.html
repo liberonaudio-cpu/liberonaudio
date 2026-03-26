@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO -->
+    <title>Journal — LiberonAudio | Blog de Audio Vintage y Restauración</title>
+    <meta name="description" content="Artículos, vídeos y documentación sobre restauración de equipos de audio vintage. Historias de reparaciones, técnicas, consejos y más. LiberonAudio, Madrid.">
+    <meta name="keywords" content="blog audio vintage, restauración amplificadores, reparación hi-fi, Marantz restauración, audio clásico, audiófilo blog, vlog audio vintage">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://liberonaudio.com/journal.html">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Journal — LiberonAudio | Blog de Audio Vintage">
+    <meta property="og:description" content="Historias de restauraciones, técnicas y el mundo del audio de alta fidelidad vintage.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://liberonaudio.com/journal.html">
+    <meta property="og:locale" content="es_ES">
+
+    <!-- Schema.org — Blog -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Blog",
+        "name": "Journal LiberonAudio",
+        "description": "Blog sobre restauración de equipos de audio vintage de alta gama",
+        "url": "https://liberonaudio.com/journal.html",
+        "publisher": {
+            "@type": "Organization",
+            "name": "LiberonAudio"
+        }
+    }
+    </script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Outfit:wght@200;300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- ========== LOADER ========== -->
+    <div class="loader" id="loader">
+        <div class="loader-text" id="loaderText"></div>
+    </div>
+
+    <!-- ========== NAVIGATION ========== -->
+    <nav class="nav scrolled" id="nav">
+        <a href="index.html" class="nav-logo">
+            <!-- <img src="img/logo.png" alt="LiberonAudio"> -->
+            <span class="nav-logo-text">Liberon<span>Audio</span></span>
+        </a>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="index.html#brands">Marcas</a></li>
+            <li><a href="index.html#services">Servicios</a></li>
+            <li><a href="boutique.html">Boutique</a></li>
+            <li><a href="journal.html" class="active">Journal</a></li>
+            <li><a href="index.html#contact">Contacto</a></li>
+        </ul>
+        <button class="nav-toggle" id="navToggle" aria-label="Menú">
+            <span></span><span></span><span></span>
+        </button>
+    </nav>
+
+    <!-- ========== PAGE HEADER ========== -->
+    <header class="page-header">
+        <div class="page-header-inner">
+            <div class="section-label reveal">Historias</div>
+            <h1 class="page-header-title reveal reveal-delay-1">Journal</h1>
+            <p class="page-header-subtitle reveal reveal-delay-2">
+                Documentamos cada restauración, compartimos técnicas y contamos las historias detrás de las máquinas que pasan por nuestro taller.
+            </p>
+        </div>
+    </header>
+
+    <!-- ========== TAG FILTERS ========== -->
+    <section class="journal-filters" id="journalFilters">
+        <div class="filters-inner">
+            <div class="filter-group">
+                <span class="filter-label">Filtrar por etiqueta</span>
+                <div class="filter-tags" id="tagFilters">
+                    <button class="filter-tag active" data-filter="all">Todos</button>
+                    <!-- Populated from data.js -->
+                </div>
+            </div>
+            <div class="filter-count" id="filterCount"></div>
+        </div>
+    </section>
+
+    <!-- ========== POSTS LIST VIEW ========== -->
+    <section class="journal-grid-wrapper" id="journalList">
+        <div class="journal-grid stagger-children" id="postsGrid">
+            <!-- Rendered from data.js -->
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" id="pagination"></div>
+
+        <!-- Empty state -->
+        <div class="journal-empty" id="journalEmpty" style="display:none">
+            <p>No hay publicaciones con esta etiqueta.</p>
+        </div>
+    </section>
+
+    <!-- ========== POST DETAIL VIEW (hidden by default) ========== -->
+    <article class="post-detail" id="postDetail" style="display:none">
+        <div class="post-detail-inner">
+            <button class="post-back" id="postBack">
+                <span class="arrow-left"></span>
+                Volver al Journal
+            </button>
+            <div class="post-detail-header" id="postDetailHeader"></div>
+            <div class="post-detail-body" id="postDetailBody"></div>
+            <div class="post-detail-footer" id="postDetailFooter"></div>
+        </div>
+    </article>
+
+    <!-- ========== FOOTER ========== -->
+    <footer class="contact-section">
+        <div class="footer-bar" style="margin-top: 0;">
+            <div class="footer-copy">&copy; 2025 LiberonAudio. Todos los derechos reservados.</div>
+            <div class="footer-links">
+                <a href="index.html">Inicio</a>
+                <a href="boutique.html">Boutique</a>
+                <a href="index.html#contact">Contacto</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/data.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/journal.js"></script>
+</body>
+</html>
