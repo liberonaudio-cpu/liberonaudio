@@ -296,9 +296,22 @@
        INIT
        ============================================ */
     function init() {
+        // Check URL for brand filter (from landing carousel click)
+        const params = new URLSearchParams(window.location.search);
+        const brandParam = params.get('brand');
+        if (brandParam) {
+            currentFilter = brandParam.toLowerCase();
+        }
+
         renderFilters();
         initSort();
         render();
+
+        // Update active filter button if set from URL
+        if (brandParam) {
+            const container = document.getElementById('brandFilters');
+            if (container) updateActiveFilter(container);
+        }
 
         // Modal close handlers
         document.getElementById('modalClose')?.addEventListener('click', closeModal);

@@ -114,39 +114,43 @@
     }
 
     /* ============================================
-       RENDER BRANDS
-       Checks for logo image in img/brands/.
-       If logo exists → shows logo, hover reveals name+country.
-       If no logo → shows name+country always.
+       RENDER BRANDS — CAROUSEL
+       Shows 4 brands visible, arrows to scroll.
+       Click on brand → goes to boutique filtered.
        ============================================ */
     function renderBrands() {
-        const grid = document.getElementById('brandsGrid');
-        if (!grid) return;
+        const container = document.getElementById('brandsCarousel');
+        if (!container) return;
 
-        SITE_DATA.brands.forEach(brand => {
-            const cell = document.createElement('div');
-            cell.className = 'brand-cell';
+        const track = container.querySelector('.brands-track');
+        const prevBtn = container.querySelector('.brands-arrow--prev');
+        const nextBtn = container.querySelector('.brands-arrow--next');
+        if (!track) return;
+
+        const brands = SITE_DATA.brands || [];
+        if (brands.length === 0) return;
+
+        brands.forEach(brand => {
+            const cell = document.createElement('a');
+            cell.className = 'brand-slide';
+            cell.href = `boutique.html?brand=${encodeURIComponent(brand.name)}`;
+            cell.title = `Ver equipos ${brand.name}`;
 
             if (brand.logo) {
-                // Try to show logo
                 const img = document.createElement('img');
                 img.className = 'brand-logo';
                 img.alt = brand.name;
                 img.loading = 'lazy';
                 img.src = `img/brands/${brand.logo}`;
-
-                // If image fails to load, fallback to text-only
                 img.onerror = function() {
                     this.remove();
-                    cell.classList.add('brand-cell--no-logo');
+                    cell.classList.add('brand-slide--no-logo');
                 };
-
                 cell.appendChild(img);
             } else {
-                cell.classList.add('brand-cell--no-logo');
+                cell.classList.add('brand-slide--no-logo');
             }
 
-            // Info overlay (always present, shown on hover or as fallback)
             const info = document.createElement('div');
             info.className = 'brand-info';
             info.innerHTML = `
@@ -154,9 +158,35 @@
                 <div class="brand-country">${brand.country}</div>
             `;
             cell.appendChild(info);
-
-            grid.appendChild(cell);
+            track.appendChild(cell);
         });
+
+        // Carousel scroll
+        let scrollPos = 0;
+        const slideWidth = () => {
+            const slide = track.querySelector('.brand-slide');
+            return slide ? slide.offsetWidth + 1 : 200; // +1 for gap/border
+        };
+
+        function updateArrows() {
+            if (prevBtn) prevBtn.style.opacity = scrollPos <= 0 ? '0.2' : '1';
+            if (nextBtn) nextBtn.style.opacity = scrollPos >= track.scrollWidth - track.offsetWidth - 5 ? '0.2' : '1';
+        }
+
+        if (prevBtn) prevBtn.addEventListener('click', () => {
+            scrollPos = Math.max(0, scrollPos - slideWidth());
+            track.style.transform = `translateX(-${scrollPos}px)`;
+            updateArrows();
+        });
+
+        if (nextBtn) nextBtn.addEventListener('click', () => {
+            const maxScroll = track.scrollWidth - track.offsetWidth;
+            scrollPos = Math.min(maxScroll, scrollPos + slideWidth());
+            track.style.transform = `translateX(-${scrollPos}px)`;
+            updateArrows();
+        });
+
+        updateArrows();
     }
 
     /* ============================================
@@ -214,10 +244,159 @@
     }
 
     /* ============================================
+       FLOATING BADGE — "Nueva entrada"
+       ============================================ */
+    function initBadge() {
+        const badge = SITE_DATA.badge;
+        if (!badge || !badge.enabled || !badge.entryId) return;
+
+        const el = document.createElement('a');
+        el.className = 'floating-badge';
+
+        // Link
+        if (badge.type === 'journal') {
+            el.href = `journal.html#${badge.entryId}`;
+            const post = (SITE_DATA.posts || []).find(p => p.id === badge.entryId);
+            el.innerHTML = `<span class="badge-label">${badge.text || 'Nueva entrada'}</span>
+                            <span class="badge-title">${post ? post.title : badge.entryId}</span>`;
+        } else {
+            el.href = `boutique.html#${badge.entryId}`;
+            const prod = (SITE_DATA.products || []).find(p => p.id === badge.entryId);
+            el.innerHTML = `<span class="badge-label">${badge.text || 'Nuevo equipo'}</span>
+                            <span class="badge-title">${prod ? prod.name : badge.entryId}</span>`;
+        }
+
+        // Colors
+        el.style.setProperty('--badge-bg', badge.color || '#CCFF00');
+        el.style.setProperty('--badge-fg', badge.fontColor || '#000000');
+
+        document.body.appendChild(el);
+    }
+
+    /* ============================================
+       HERO DYNAMIC IMAGES
+       Supports: single, random, slideshow
+       ============================================ */
+    function initHero() {
+        const container = document.getElementById('heroBackground');
+        if (!container) return;
+
+        const hero = SITE_DATA.hero;
+        if (!hero || !hero.images || hero.images.length === 0) return;
+
+        const images = hero.images.map(img => `img/hero/${img}`);
+        const mode = hero.mode || 'single';
+
+        // Create image element
+        function setImage(src) {
+            container.innerHTML = '';
+            const img = document.createElement('img');
+            img.src = src;
+            img.alt = 'LiberonAudio';
+            img.style.cssText = 'width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1s ease;';
+            container.appendChild(img);
+            // Fade in
+            img.onload = () => { img.style.opacity = '1'; };
+        }
+
+        if (mode === 'single') {
+            setImage(images[0]);
+        } else if (mode === 'random') {
+            const randomIdx = Math.floor(Math.random() * images.length);
+            setImage(images[randomIdx]);
+        } else if (mode === 'slideshow') {
+            let currentIdx = 0;
+            setImage(images[0]);
+            const interval = (hero.interval || 5) * 1000;
+            setInterval(() => {
+                currentIdx = (currentIdx + 1) % images.length;
+                setImage(images[currentIdx]);
+            }, interval);
+        }
+    }
+
+    /* ============================================
+       VIDEO EMBED HELPER (YouTube, TikTok, Instagram)
+       Used by Journal to embed videos from any platform.
+       ============================================ */
+    window.LiberonUtils = {
+        createVideoEmbed: function(url, type) {
+            if (!url) return '';
+
+            type = (type || 'youtube').toLowerCase();
+
+            // YouTube
+            if (type === 'youtube' || url.includes('youtube.com') || url.includes('youtu.be')) {
+                const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+                if (match) {
+                    return `<div class="post-detail-video">
+                        <iframe src="https://www.youtube.com/embed/${match[1]}"
+                                frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowfullscreen></iframe>
+                    </div>`;
+                }
+            }
+
+            // TikTok
+            if (type === 'tiktok' || url.includes('tiktok.com')) {
+                const match = url.match(/tiktok\.com\/@[^/]+\/video\/(\d+)/);
+                if (match) {
+                    return `<div class="post-detail-video">
+                        <iframe src="https://www.tiktok.com/embed/v2/${match[1]}"
+                                frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope"
+                                allowfullscreen></iframe>
+                    </div>`;
+                }
+                // Fallback: link with preview
+                return `<div class="post-video-link">
+                    <a href="${url}" target="_blank" rel="noopener">
+                        <span class="video-link-icon">▶</span>
+                        Ver vídeo en TikTok
+                    </a>
+                </div>`;
+            }
+
+            // Instagram
+            if (type === 'instagram' || url.includes('instagram.com')) {
+                // Instagram embeds need their embed.js script
+                const match = url.match(/instagram\.com\/(?:p|reel|tv)\/([a-zA-Z0-9_-]+)/);
+                if (match) {
+                    return `<div class="post-detail-video post-detail-video--ig">
+                        <iframe src="https://www.instagram.com/p/${match[1]}/embed"
+                                frameborder="0" scrolling="no"
+                                allowfullscreen></iframe>
+                    </div>
+                    <div class="post-video-link" style="margin-top:0.5rem;">
+                        <a href="${url}" target="_blank" rel="noopener">
+                            Abrir en Instagram ↗
+                        </a>
+                    </div>`;
+                }
+                return `<div class="post-video-link">
+                    <a href="${url}" target="_blank" rel="noopener">
+                        <span class="video-link-icon">▶</span>
+                        Ver en Instagram
+                    </a>
+                </div>`;
+            }
+
+            // Fallback: just link
+            return `<div class="post-video-link">
+                <a href="${url}" target="_blank" rel="noopener">
+                    <span class="video-link-icon">▶</span>
+                    Ver vídeo
+                </a>
+            </div>`;
+        }
+    };
+
+    /* ============================================
        INIT
        ============================================ */
     initLoader();
     initNav();
+    initHero();
+    initBadge();
     renderBrands();
     renderServices();
     renderContact();

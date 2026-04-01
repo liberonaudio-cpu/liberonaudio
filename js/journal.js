@@ -207,7 +207,8 @@
         detail.style.display = 'block';
 
         const dateFormatted = formatDate(post.date);
-        const image = post.image ? `img/posts/${post.image}` : '';
+        const images = post.images || (post.image ? [post.image] : []);
+        const mainImage = images.length > 0 ? `img/posts/${images[0]}` : '';
 
         // Header
         header.innerHTML = `
@@ -226,27 +227,26 @@
         // Body
         let bodyHTML = '';
 
-        if (image) {
-            bodyHTML += `<div class="post-detail-hero-image"><img src="${image}" alt="${post.title}"></div>`;
+        if (mainImage) {
+            bodyHTML += `<div class="post-detail-hero-image"><img src="${mainImage}" alt="${post.title}"></div>`;
         }
 
-        // Embedded video
+        // Embedded video (YouTube, TikTok, Instagram)
         if (post.video) {
-            // Support YouTube URLs
-            const videoId = extractYouTubeId(post.video);
-            if (videoId) {
-                bodyHTML += `
-                    <div class="post-detail-video">
-                        <iframe src="https://www.youtube.com/embed/${videoId}"
-                                frameborder="0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowfullscreen></iframe>
-                    </div>
-                `;
-            }
+            bodyHTML += window.LiberonUtils.createVideoEmbed(post.video, post.videoType);
         }
 
         bodyHTML += `<div class="post-detail-content">${post.content || post.excerpt || ''}</div>`;
+
+        // Additional images gallery
+        if (images.length > 1) {
+            bodyHTML += '<div class="post-gallery">';
+            for (let i = 1; i < images.length; i++) {
+                bodyHTML += `<div class="post-gallery-img"><img src="img/posts/${images[i]}" alt="${post.title} ${i + 1}" loading="lazy"></div>`;
+            }
+            bodyHTML += '</div>';
+        }
+
         body.innerHTML = bodyHTML;
 
         // Footer — next/prev navigation
