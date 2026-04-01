@@ -18,11 +18,11 @@ const SITE_DATA = {
         "interval": 5
     },
     "badge": {
-        "enabled": false,
+        "enabled": true,
         "type": "journal",
         "entryId": "",
-        "color": "#CCFF00",
         "text": "Nueva entrada",
+        "color": "#CCFF00",
         "fontColor": "#000000"
     },
     "brands": [],
