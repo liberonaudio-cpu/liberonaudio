@@ -14,7 +14,9 @@ const SITE_DATA = {
     },
     "hero": {
         "mode": "single",
-        "images": [],
+        "images": [
+            "kenwood-ka7100.jpeg"
+        ],
         "interval": 5
     },
     "badge": {
